@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const navbar = document.getElementById('navbar');
-    const navToggle = document.getElementById('navToggle');
-    const navMenu = document.getElementById('navMenu');
-    const navLinks = document.querySelectorAll('.nav-link');
+    var navbar = document.getElementById('navbar');
+    var navToggle = document.getElementById('navToggle');
+    var navMenu = document.getElementById('navMenu');
+    var navLinks = document.querySelectorAll('.nav-link');
+    var STORAGE_KEY = 'diamondspa_bookings';
 
     // Navbar scroll effect
     function handleScroll() {
@@ -32,17 +33,114 @@ document.addEventListener('DOMContentLoaded', function() {
     // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
         anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            var target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                var offset = 80;
-                var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
-                window.scrollTo({ top: top, behavior: 'smooth' });
+            var href = this.getAttribute('href');
+            if (href.length > 1) {
+                e.preventDefault();
+                var target = document.querySelector(href);
+                if (target) {
+                    var offset = 80;
+                    var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                    window.scrollTo({ top: top, behavior: 'smooth' });
+                }
             }
         });
     });
 
-    // Intersection Observer for scroll animations
+    // SET MIN DATE TO TODAY
+    var dateInputs = document.querySelectorAll('input[type="date"]');
+    var today = new Date().toISOString().split('T')[0];
+    dateInputs.forEach(function(input) {
+        input.setAttribute('min', today);
+    });
+
+    // BOOKING SYSTEM
+    function getBookings() {
+        try {
+            var data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        } catch(e) {
+            return [];
+        }
+    }
+
+    function saveBookings(bookings) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
+    }
+
+    function generateId() {
+        return 'BK' + Date.now() + Math.random().toString(36).substr(2, 5);
+    }
+
+    function formatWhatsAppMessage(booking) {
+        var msg = 'Hello Diamond Spa! I\'d like to book an appointment.\n\n';
+        msg += '*Booking Details:*\n';
+        msg += 'Name: ' + booking.name + '\n';
+        msg += 'Phone: ' + booking.phone + '\n';
+        msg += 'Service: ' + booking.service + '\n';
+        msg += 'Date: ' + booking.date + '\n';
+        msg += 'Time: ' + booking.time + '\n';
+        if (booking.notes) {
+            msg += 'Notes: ' + booking.notes + '\n';
+        }
+        msg += '\nPlease confirm my appointment. Thank you!';
+        return msg;
+    }
+
+    // HANDLE BOOKING FORM SUBMISSION
+    var bookingForm = document.getElementById('bookingForm');
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            var name = document.getElementById('bookName').value.trim();
+            var phone = document.getElementById('bookPhone').value.trim();
+            var service = document.getElementById('bookService').value;
+            var date = document.getElementById('bookDate').value;
+            var time = document.getElementById('bookTime').value;
+            var notes = document.getElementById('bookNotes').value.trim();
+
+            if (!name || !phone || !service || !date || !time) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            var booking = {
+                id: generateId(),
+                name: name,
+                phone: phone,
+                service: service,
+                date: date,
+                time: time,
+                notes: notes,
+                status: 'pending',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            // Save to localStorage
+            var bookings = getBookings();
+            bookings.push(booking);
+            saveBookings(bookings);
+
+            // Format WhatsApp message
+            var waMsg = formatWhatsAppMessage(booking);
+            var waUrl = 'https://wa.me/2349066686805?text=' + encodeURIComponent(waMsg);
+
+            // Show success message
+            var formWrap = bookingForm.parentElement;
+            formWrap.innerHTML = '<div class="booking-success">' +
+                '<div class="success-icon">&#10004;</div>' +
+                '<h3>Booking Received!</h3>' +
+                '<p>Your appointment request has been saved. Click below to confirm via WhatsApp, or we\'ll contact you shortly.</p>' +
+                '<br>' +
+                '<a href="' + waUrl + '" class="btn btn-gold" target="_blank" style="margin-bottom:12px;">&#128172; Confirm via WhatsApp</a>' +
+                '<br>' +
+                '<a href="#home" class="btn btn-outline-dark">Book Another Appointment</a>' +
+                '</div>';
+        });
+    }
+
+    // INTERSECTION OBSERVER FOR ANIMATIONS
     var observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
@@ -91,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ';
     document.head.appendChild(style);
 
-    // Counter animation
+    // COUNTER ANIMATION
     function animateCounter(el, target, duration) {
         var start = 0;
         var isDecimal = target % 1 !== 0;
@@ -142,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function() {
         counterObserver.observe(el);
     });
 
-    // Active nav link highlighting
+    // ACTIVE NAV LINK HIGHLIGHTING
     var sections = document.querySelectorAll('section[id]');
 
     function highlightNav() {

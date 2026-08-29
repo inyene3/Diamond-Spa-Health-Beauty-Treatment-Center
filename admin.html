@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Diamond Spa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">
+                <img src="images/logo.png" alt="Diamond Spa Logo" class="login-logo-img">
+            </div>
+            <h2>Admin Panel</h2>
+            <p>Enter your admin password to access the dashboard.</p>
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="password" id="loginPassword" placeholder="Enter password" required>
+                    <p class="login-error" id="loginError">Incorrect password. Try again.</p>
+                </div>
+                <button type="submit" class="btn btn-gold">Login</button>
+            </form>
+            <p class="login-hint">Default password: <strong>diamond2024</strong></p>
+        </div>
+    </div>
+
+    <div class="admin-panel" id="adminPanel" style="display:none;">
+        <header class="admin-header">
+            <div class="admin-header-inner">
+                <div class="admin-brand">
+                    <img src="images/logo.png" alt="Diamond Spa" class="admin-logo-img">
+                </div>
+                <div class="admin-header-right">
+                    <span class="admin-user">&#128100; Admin</span>
+                    <button class="btn btn-outline-sm" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="admin-main">
+            <div class="admin-container">
+                <div class="admin-stats">
+                    <div class="admin-stat-card">
+                        <div class="stat-icon">&#128197;</div>
+                        <div class="stat-info">
+                            <div class="stat-num" id="totalBookings">0</div>
+                            <div class="stat-text">Total Bookings</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card pending">
+                        <div class="stat-icon">&#9203;</div>
+                        <div class="stat-info">
+                            <div class="stat-num" id="pendingBookings">0</div>
+                            <div class="stat-text">Pending</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card confirmed">
+                        <div class="stat-icon">&#9989;</div>
+                        <div class="stat-info">
+                            <div class="stat-num" id="confirmedBookings">0</div>
+                            <div class="stat-text">Confirmed</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card completed">
+                        <div class="stat-icon">&#11088;</div>
+                        <div class="stat-info">
+                            <div class="stat-num" id="completedBookings">0</div>
+                            <div class="stat-text">Completed</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-toolbar">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Search by name or phone...">
+                    </div>
+                    <div class="filter-box">
+                        <select id="filterStatus">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <select id="filterService">
+                            <option value="all">All Services</option>
+                            <option value="Pedicure & Nail Care">Pedicure & Nail Care</option>
+                            <option value="Infrared Sauna & Wellness">Infrared Sauna</option>
+                            <option value="Dental & Facial Care">Dental & Facial</option>
+                            <option value="Massage Therapy">Massage</option>
+                            <option value="Eyebrow Shaping">Eyebrow Shaping</option>
+                            <option value="Body Treatments">Body Treatments</option>
+                        </select>
+                        <button class="btn btn-outline-sm" id="clearFilters">Clear</button>
+                    </div>
+                </div>
+
+                <div class="bookings-table-wrap">
+                    <table class="bookings-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer</th>
+                                <th>Phone</th>
+                                <th>Service</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Notes</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookingsTableBody">
+                            <tr class="empty-row">
+                                <td colspan="9">
+                                    <div class="empty-state">
+                                        <span class="empty-icon">&#128197;</span>
+                                        <p>No bookings yet. Appointments will appear here when customers book.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="admin-actions-bar">
+                    <button class="btn btn-outline-sm" id="exportCsv">&#128229; Export CSV</button>
+                    <button class="btn btn-outline-sm danger" id="clearAllBtn">&#128465; Clear All Bookings</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-sm">
+            <h3 id="modalTitle">Confirm Action</h3>
+            <p id="modalMessage">Are you sure?</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline-sm" id="modalCancel">Cancel</button>
+                <button class="btn btn-gold" id="modalConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Detail Modal -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-md">
+            <button class="modal-close-btn" id="detailClose">&times;</button>
+            <h3>Booking Details</h3>
+            <div class="detail-grid" id="detailContent"></div>
+            <div class="detail-actions" id="detailActions"></div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
