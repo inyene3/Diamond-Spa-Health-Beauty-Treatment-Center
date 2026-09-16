@@ -8,6 +8,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="admin.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
 </head>
 <body>
 
@@ -35,6 +39,10 @@
                 <div class="admin-brand">
                     <img src="images/logo.png" alt="Diamond Spa" class="admin-logo-img">
                 </div>
+                <nav class="admin-tabs">
+                    <button class="admin-tab active" data-tab="bookings">&#128197; Bookings</button>
+                    <button class="admin-tab" data-tab="services">&#128196; Services</button>
+                </nav>
                 <div class="admin-header-right">
                     <span class="admin-user">&#128100; Admin</span>
                     <button class="btn btn-outline-sm" id="logoutBtn">Logout</button>
@@ -44,96 +52,151 @@
 
         <main class="admin-main">
             <div class="admin-container">
-                <div class="admin-stats">
-                    <div class="admin-stat-card">
-                        <div class="stat-icon">&#128197;</div>
-                        <div class="stat-info">
-                            <div class="stat-num" id="totalBookings">0</div>
-                            <div class="stat-text">Total Bookings</div>
+
+                <!-- BOOKINGS TAB -->
+                <div class="tab-content active" id="tab-bookings">
+                    <div class="admin-stats">
+                        <div class="admin-stat-card">
+                            <div class="stat-icon">&#128197;</div>
+                            <div class="stat-info">
+                                <div class="stat-num" id="totalBookings">0</div>
+                                <div class="stat-text">Total Bookings</div>
+                            </div>
+                        </div>
+                        <div class="admin-stat-card pending">
+                            <div class="stat-icon">&#9203;</div>
+                            <div class="stat-info">
+                                <div class="stat-num" id="pendingBookings">0</div>
+                                <div class="stat-text">Pending</div>
+                            </div>
+                        </div>
+                        <div class="admin-stat-card confirmed">
+                            <div class="stat-icon">&#9989;</div>
+                            <div class="stat-info">
+                                <div class="stat-num" id="confirmedBookings">0</div>
+                                <div class="stat-text">Confirmed</div>
+                            </div>
+                        </div>
+                        <div class="admin-stat-card completed">
+                            <div class="stat-icon">&#11088;</div>
+                            <div class="stat-info">
+                                <div class="stat-num" id="completedBookings">0</div>
+                                <div class="stat-text">Completed</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="admin-stat-card pending">
-                        <div class="stat-icon">&#9203;</div>
-                        <div class="stat-info">
-                            <div class="stat-num" id="pendingBookings">0</div>
-                            <div class="stat-text">Pending</div>
+
+                    <div class="admin-toolbar">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="Search by name or phone...">
+                        </div>
+                        <div class="filter-box">
+                            <select id="filterStatus">
+                                <option value="all">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                            <button class="btn btn-outline-sm" id="clearFilters">Clear</button>
                         </div>
                     </div>
-                    <div class="admin-stat-card confirmed">
-                        <div class="stat-icon">&#9989;</div>
-                        <div class="stat-info">
-                            <div class="stat-num" id="confirmedBookings">0</div>
-                            <div class="stat-text">Confirmed</div>
-                        </div>
+
+                    <div class="bookings-table-wrap">
+                        <table class="bookings-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Service</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookingsTableBody">
+                                <tr class="empty-row">
+                                    <td colspan="8">
+                                        <div class="empty-state">
+                                            <span class="empty-icon">&#128197;</span>
+                                            <p>No bookings yet. Appointments will appear here when customers book.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="admin-stat-card completed">
-                        <div class="stat-icon">&#11088;</div>
-                        <div class="stat-info">
-                            <div class="stat-num" id="completedBookings">0</div>
-                            <div class="stat-text">Completed</div>
-                        </div>
+
+                    <div class="admin-actions-bar">
+                        <button class="btn btn-outline-sm" id="exportCsv">&#128229; Export CSV</button>
+                        <button class="btn btn-outline-sm danger" id="clearAllBtn">&#128465; Clear All Bookings</button>
                     </div>
                 </div>
 
-                <div class="admin-toolbar">
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Search by name or phone...">
+                <!-- SERVICES TAB -->
+                <div class="tab-content" id="tab-services" style="display:none;">
+                    <div class="services-header">
+                        <h2>Manage Services</h2>
+                        <button class="btn btn-gold" id="addServiceBtn">+ Add New Service</button>
                     </div>
-                    <div class="filter-box">
-                        <select id="filterStatus">
-                            <option value="all">All Status</option>
-                            <option value="pending">Pending</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="completed">Completed</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
-                        <select id="filterService">
-                            <option value="all">All Services</option>
-                            <option value="Pedicure & Nail Care">Pedicure & Nail Care</option>
-                            <option value="Infrared Sauna & Wellness">Infrared Sauna</option>
-                            <option value="Dental & Facial Care">Dental & Facial</option>
-                            <option value="Massage Therapy">Massage</option>
-                            <option value="Eyebrow Shaping">Eyebrow Shaping</option>
-                            <option value="Body Treatments">Body Treatments</option>
-                        </select>
-                        <button class="btn btn-outline-sm" id="clearFilters">Clear</button>
+
+                    <div class="services-grid-admin" id="servicesGrid">
+                        <!-- Services loaded dynamically -->
                     </div>
                 </div>
 
-                <div class="bookings-table-wrap">
-                    <table class="bookings-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Customer</th>
-                                <th>Phone</th>
-                                <th>Service</th>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Notes</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bookingsTableBody">
-                            <tr class="empty-row">
-                                <td colspan="9">
-                                    <div class="empty-state">
-                                        <span class="empty-icon">&#128197;</span>
-                                        <p>No bookings yet. Appointments will appear here when customers book.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="admin-actions-bar">
-                    <button class="btn btn-outline-sm" id="exportCsv">&#128229; Export CSV</button>
-                    <button class="btn btn-outline-sm danger" id="clearAllBtn">&#128465; Clear All Bookings</button>
-                </div>
             </div>
         </main>
+    </div>
+
+    <!-- Add/Edit Service Modal -->
+    <div class="modal-overlay" id="serviceModal">
+        <div class="modal-md">
+            <button class="modal-close-btn" id="serviceModalClose">&times;</button>
+            <h3 id="serviceModalTitle">Add New Service</h3>
+            <form id="serviceForm">
+                <input type="hidden" id="serviceId">
+                <div class="form-group">
+                    <label for="serviceName">Service Name *</label>
+                    <input type="text" id="serviceName" placeholder="e.g. Massage Therapy" required>
+                </div>
+                <div class="form-group">
+                    <label for="serviceDesc">Description *</label>
+                    <textarea id="serviceDesc" rows="3" placeholder="Describe the service..." required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="servicePrice">Price *</label>
+                        <input type="text" id="servicePrice" placeholder="e.g. from ₦5,000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceWa">WhatsApp Text</label>
+                        <input type="text" id="serviceWa" placeholder="Pre-filled WhatsApp message">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Service Image</label>
+                    <div class="image-upload" id="imageUpload">
+                        <input type="file" id="serviceImage" accept="image/*" class="file-input">
+                        <div class="upload-placeholder" id="uploadPlaceholder">
+                            <span class="upload-icon">&#128247;</span>
+                            <p>Click or drag to upload image</p>
+                        </div>
+                        <img id="imagePreview" class="image-preview" style="display:none;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="serviceImageUrl">Or paste Image URL</label>
+                    <input type="url" id="serviceImageUrl" placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline-sm" id="serviceCancel">Cancel</button>
+                    <button type="submit" class="btn btn-gold" id="serviceSaveBtn">Save Service</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Confirm Modal -->
@@ -159,5 +222,15 @@
     </div>
 
     <script src="admin.js"></script>
+    <script>
+        // Debug: Check Firebase status
+        setTimeout(function() {
+            console.log('Firebase Ready:', typeof firebaseReady !== 'undefined' ? firebaseReady : 'undefined');
+            console.log('DB:', typeof db !== 'undefined' ? (db ? 'connected' : 'null') : 'undefined');
+            if (typeof firebase !== 'undefined') {
+                console.log('Firebase Apps:', firebase.apps.length);
+            }
+        }, 2000);
+    </script>
 </body>
 </html>

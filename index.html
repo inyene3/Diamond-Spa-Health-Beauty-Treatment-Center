@@ -9,6 +9,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
 </head>
 <body>
 
@@ -30,7 +34,7 @@
                 <li><a href="#reviews" class="nav-link">Reviews</a></li>
                 <li><a href="#gallery" class="nav-link">Gallery</a></li>
                 <li><a href="#contact" class="nav-link">Visit</a></li>
-                <li><a href="https://wa.me/2349066686805" class="nav-link nav-cta" target="_blank">Book on WhatsApp</a></li>
+                <li><a href="#booking" class="nav-link nav-cta">Book Appointment</a></li>
             </ul>
         </div>
     </nav>
@@ -48,7 +52,7 @@
             <h1 class="hero-title">Where beauty <em>breathes</em><br>and calm returns.</h1>
             <p class="hero-subtitle">Festac Town's home of restorative massage, glowing facials and expert brow artistry. Step in, exhale, and let our therapists take care of the rest.</p>
             <div class="hero-buttons">
-                <a href="https://wa.me/2349066686805?text=Hi!%20I'd%20like%20to%20book%20a%20treatment." class="btn btn-gold" target="_blank">
+                <a href="#booking" class="btn btn-gold">
                     <span class="btn-icon">&#9993;</span> Book your treatment
                 </a>
                 <a href="#services" class="btn btn-outline-light">Explore services</a>
@@ -86,49 +90,8 @@
             <p class="section-tag center">OUR SERVICES</p>
             <h2 class="section-title center">Treatments crafted around you</h2>
             <p class="section-desc center">Every session at Diamond Spa is personal. We listen first, then tailor each treatment to what your skin and body actually need.</p>
-            <div class="services-grid">
-                <div class="service-card">
-                    <div class="service-img-wrap">
-                        <img src="images/pedicure.png" alt="Pedicure and foot care station" loading="lazy">
-                    </div>
-                    <div class="service-body">
-                        <div class="service-icon-wrap">&#128134;</div>
-                        <h3>Pedicure & Nail Care</h3>
-                        <p>Luxurious pedicure stations with professional foot care. Relax in comfort while our experts pamper your hands and feet.</p>
-                        <div class="service-footer">
-                            <span class="price">from &#8358;5,000</span>
-                            <a href="https://wa.me/2349066686805?text=Hi!%20I'd%20like%20to%20book%20a%20pedicure." class="book-link" target="_blank">BOOK NOW &rarr;</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="service-card">
-                    <div class="service-img-wrap">
-                        <img src="images/sauna.png" alt="Infrared sauna room" loading="lazy">
-                    </div>
-                    <div class="service-body">
-                        <div class="service-icon-wrap">&#127777;</div>
-                        <h3>Infrared Sauna & Wellness</h3>
-                        <p>Detoxify and rejuvenate with our far-infrared spectrum energy room. Experience deep relaxation and healing warmth.</p>
-                        <div class="service-footer">
-                            <span class="price">from &#8358;8,000</span>
-                            <a href="https://wa.me/2349066686805?text=Hi!%20I'd%20like%20to%20book%20a%20sauna%20session." class="book-link" target="_blank">BOOK NOW &rarr;</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="service-card">
-                    <div class="service-img-wrap">
-                        <img src="images/dental.png" alt="Facial and dental care treatment" loading="lazy">
-                    </div>
-                    <div class="service-body">
-                        <div class="service-icon-wrap">&#10024;</div>
-                        <h3>Dental & Facial Care</h3>
-                        <p>Professional dental hygiene and facial treatments using advanced equipment. Brighten your smile and refresh your skin.</p>
-                        <div class="service-footer">
-                            <span class="price">from &#8358;10,000</span>
-                            <a href="https://wa.me/2349066686805?text=Hi!%20I'd%20like%20to%20book%20a%20dental/facial%20session." class="book-link" target="_blank">BOOK NOW &rarr;</a>
-                        </div>
-                    </div>
-                </div>
+            <div class="services-grid" id="customerServices">
+                <!-- Services loaded dynamically from admin -->
             </div>
         </div>
     </section>
@@ -320,7 +283,7 @@
                                 <input type="text" id="bookName" name="name" placeholder="Your full name" required>
                             </div>
                             <div class="form-group">
-                                <label for="bookPhone">Phone Number *</label>
+                                <label for="bookPhone">WhatsApp Number *</label>
                                 <input type="tel" id="bookPhone" name="phone" placeholder="e.g. 0801 234 5678" required>
                             </div>
                         </div>
@@ -364,9 +327,9 @@
                             <textarea id="bookNotes" name="notes" rows="3" placeholder="Any special requests or preferences..."></textarea>
                         </div>
                         <button type="submit" class="btn btn-gold btn-full">
-                            &#128172; Confirm Booking via WhatsApp
+                            &#10004; Confirm Appointment
                         </button>
-                        <p class="form-note">You'll be redirected to WhatsApp to confirm your appointment.</p>
+                        <p class="form-note">After confirming, you can also confirm via WhatsApp.</p>
                     </form>
                 </div>
             </div>

@@ -402,6 +402,16 @@ img {
     transition: transform 0.5s ease;
 }
 
+.service-img-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--dark), var(--dark-mid));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+}
+
 .service-card:hover .service-img-wrap img {
     transform: scale(1.05);
 }
